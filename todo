@@ -1,14 +1,11 @@
-Certificate Authority:
-    Generate Key
-    Renew Key
-    Verify Key
-    Store Key
+Server:
+X   /key > gives server's verification key
+X   /register > generate's a signing + verification key and propogatesX   /vote > submit's vote and propogates
+X   /results > returns the results of the election
+    /ledger > returns the ledgeer of the votes
+    publish functions > pushes update to other nodes
+    /publish_registration > other servers send their registration here
 
-Election Administrator:
-    Create Election (choose candidates)
-    Submit Vote
-    End Election (display result)
-    Download Election Ledger
 
 Offline:
     Verify Election Ledger script
