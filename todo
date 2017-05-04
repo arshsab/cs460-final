@@ -1,0 +1,16 @@
+Certificate Authority:
+    Generate Key
+    Renew Key
+    Verify Key
+    Store Key
+
+Election Administrator:
+    Create Election (choose candidates)
+    Submit Vote
+    End Election (display result)
+    Download Election Ledger
+
+Offline:
+    Verify Election Ledger script
+    Check vote script
+    Create vote script
