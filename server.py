@@ -1,5 +1,5 @@
 from flask import Flask, request
-import config
+from config import *
 import time
 from blockchain import *
 import json
@@ -18,32 +18,40 @@ def publish_vote(msg):
 def publish_registration(msg):
     pass
 
+@app.route('/status')
+def status():
+    return ''
+
 @app.route('/key')
 def verify():
     return server_vk
 
-@app.route('/register')
+@app.route('/choices')
+def choices():
+    return json.dumps(options)
+
+@app.route('/register', methods=['POST'])
 def register():
     name = request.args.get('name')
+    vk = request.args.get('vk')
 
     if name in names:
         return json.loads({"success": False})
 
-    sk, vk = generate_key_pair()
-    message = generate_registration_message(server_sk, server_vk, name, vk)
+    message = generate_registration_message(server_sk, server_vk, vk)
     publish_registration(message)
 
     names.add(name)
-    keys[vk] = 0
+    keys[vk] = 0, None
 
     return json.dumps({"success": True,
-                       "vk": vk,
-                       "sk": sk})
+                       "vk": vk})
 
 @app.route('/vote', methods=['POST'])
 def vote():
     print(request.args)
     vote = json.loads(request.args.get('vote'))
+    print(vote)
     vk = vote['vk']
 
     if vk not in keys:
@@ -56,18 +64,21 @@ def vote():
     action = payload['action']
     sub_time = payload['timestamp']
 
-    if choice not in config.choices:
+    if choice not in options:
         return json.dumps({"success": False})
     if action != 'vote':
         return json.dumps({"success": False})
 
-    time, choice = keys[ck]
+    time, old_choice = keys[vk]
     if time >= sub_time:
         return json.dumps({"success": False})
 
     publish_vote(vote)
     keys[vk] = sub_time, choice
+
     results[choice] += 1
+    if old_choice:
+        results[old_choice] -= 1
 
     return json.dumps({"success": True})
 

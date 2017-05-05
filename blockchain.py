@@ -13,8 +13,8 @@ def sign_message(message, sk_string):
     sk = SigningKey.from_string(bytes.fromhex(sk_string))
     return sk.sign(message.encode('UTF-8'))
 
-def verify_message(message, signature, vk_string):
-    payload = message['payload']
+def verify_message(message):
+    payload = message['payload'].encode('UTF-8')
     vk_string = message['vk']
     signature = message['sig']
 
@@ -36,10 +36,9 @@ def generate_vote_message(sk_string, vk_string, choice):
 
     return generate_message(payload, sk_string, vk_string)
 
-def generate_registration_message(sk_string, vk_string, name, new_vk):
+def generate_registration_message(sk_string, vk_string, new_vk):
     message = json.dumps(
-            {"name": name,
-             "action": "register",
+            {"action": "register",
              "vk": new_vk,
              "timestamp": round(time.time()),
              "nonce": os.urandom(32).hex()})
