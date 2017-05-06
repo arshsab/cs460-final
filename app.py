@@ -1,4 +1,5 @@
 from blockchain import *
+from collections import Counter
 import requests
 
 def create(server):
@@ -29,10 +30,8 @@ def vote(server):
 
     choice = input('Who do you vote for? ')
     message = generate_vote_message(sk, vk, choice)
-    print(message)
 
     resp = requests.post(server + '/vote', params={'vote': message})
-    print(resp)
     resp = resp.json()
 
     if resp['success']:
@@ -40,14 +39,73 @@ def vote(server):
     else:
         print('Voting failed. :(')
 
-def results(server):
-    resp = requests.get(server + '/results').json()
+def fetch_ledger(server):
+    resp = requests.get(server + '/ledger').json()
 
-    for cand, votes in resp.items():
+    return resp['vks'], resp['ledger']
+
+def results(server):
+    servks, ledger = fetch_ledger(server)
+
+    keys = {}
+    results = Counter()
+
+    for message in ledger:
+        message = json.loads(message)
+
+        if not verify_message(message):
+            continue
+
+        vk = message['vk']
+        payload = json.loads(message['payload'])
+
+        if payload['action'] == 'vote' and vk in keys:
+            new_choice = payload['choice']
+            new_time = payload['timestamp']
+
+            old_time, old_choice = keys[vk]
+            if old_time < new_time:
+                keys[vk] = new_time, new_choice
+
+                results[new_choice] += 1
+                if old_choice:
+                    results[old_choice] -= 1
+        elif payload['action'] == 'register' and vk in servks:
+            new_vk = payload['vk']
+            keys[new_vk] = 0, None
+
+    for cand, votes in results.items():
         print(cand, 'got', votes, 'votes')
 
 def checkvote(server):
-    pass
+    servks, ledger = fetch_ledger(server)
+
+    with open('key') as f:
+        lines = f.readlines()
+
+    [_, vk] = [x.strip() for x in lines]
+
+    curr_time, curr_choice = 0, None
+    for message in ledger:
+        message = json.loads(message)
+
+        if not verify_message(message):
+            continue
+
+        if message['vk'] != vk:
+            continue
+
+
+        payload = json.loads(message['payload'])
+        if payload['action'] == 'vote':
+            new_choice = payload['choice']
+            new_time = payload['timestamp']
+
+            if curr_time < new_time:
+                curr_time = new_time
+                curr_choice = new_choice
+
+    print('You chose: ', curr_choice)
 
 def main():
     server = input('Server: ')
