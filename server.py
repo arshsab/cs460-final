@@ -9,6 +9,7 @@ app = Flask(__name__)
 keys = {}
 names = set()
 results = Counter()
+ledger = []
 
 server_sk, server_vk = generate_key_pair()
 
@@ -40,6 +41,7 @@ def register():
 
     message = generate_registration_message(server_sk, server_vk, vk)
     publish_registration(message)
+    ledger.append(message)
 
     names.add(name)
     keys[vk] = 0, None
@@ -49,9 +51,7 @@ def register():
 
 @app.route('/vote', methods=['POST'])
 def vote():
-    print(request.args)
     vote = json.loads(request.args.get('vote'))
-    print(vote)
     vk = vote['vk']
 
     if vk not in keys:
@@ -69,6 +69,8 @@ def vote():
     if action != 'vote':
         return json.dumps({"success": False})
 
+    ledger.append(request.args.get('vote'))
+
     time, old_choice = keys[vk]
     if time >= sub_time:
         return json.dumps({"success": False})
@@ -85,6 +87,10 @@ def vote():
 @app.route('/results')
 def get_results():
     return json.dumps(results)
+
+@app.route('/ledger')
+def get_ledger():
+    return json.dumps({'vks': [server_vk], 'ledger': ledger})
 
 if __name__ == '__main__':
     app.run(port=8080)
