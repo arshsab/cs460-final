@@ -1,7 +1,7 @@
 import time
 
-nodes = {'localhost:8080': (None, None),
-         'localhost:8081': (None, None),
-         'localhost:8082': (None, None)}
+nodes = {'localhost:8080': ('31b55aea2c6624a6c7324b9b14d128f5404a54a6be755d0c', '3ae802f94add9300e8aad7c1cecda4558386e8feff7036690f044363fe015f5aef1d95b5b684943cf3a6afd0b510b5f4'),
+         'localhost:8081': ('0de89549e4d7615a5abad8aca0325bc970306340f04316f6', '6cb2811d39f15421e56ed1f9ab0dd83893459b4748a1e1353633b421befba054b482d1d67863d9086e14d18a13053c74'),
+         'localhost:8082': ('04918058c456d12b1a4bd74f0b20c6816fe00cdf2d5e198d', 'f70335b49f596b7203ea933b39833302a6e726cbc18a8919ad9460b36b0abbfc443f9c97724a0a962bdf73fbae6ffce7') }
 options = ['Bernie', 'Hillary', 'Trump']
 end_time = time.time() + 24 * 3600
