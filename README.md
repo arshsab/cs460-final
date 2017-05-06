@@ -2,8 +2,10 @@
 
 ## Usage
 
-1. To use this software, run the server using `python3` (`python3 server.py`). 
-2. Perform actions from your Terminal using `python3 app.py`
+1. To use this software, run the server using `python3 server.py [--port PORT]`
+2. Run multiple servers with different ports if neccesary.
+3. Change the default keys in `config.py` for more security.
+4. Perform actions from your terminal using `python3 app.py`
 
 ## Motivation
 
