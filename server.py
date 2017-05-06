@@ -16,16 +16,17 @@ ledger = []
 # server_sk, server_vk = generate_key_pair()
 server_sk = None
 server_vk = None
+nodes_list = None
 
 def publish_vote(msg):
-    for node in nodes.keys():
+    for node in nodes_list:
         try:
             r = requests.post('http://'+node+'/vote', params={'vote': msg}, timeout=5)
         except:
             print("Can't connect to server {}".format(node))
 
 def publish_registration(msg):
-    for node in nodes.keys():
+    for node in nodes_list:
         try:
             r = requests.post('http://'+node+'/publish_registration', params={'registration': msg}, timeout=5)
         except:
@@ -83,7 +84,7 @@ def internal_registration():
         return json.dumps({'success': False})
 
     keys[payload['vk']] = 0, None
-    ledger.append(message)
+    ledger.append(json.dumps(reg))
 
     return json.dumps({"success": True,
                        "vk": payload['vk']})
@@ -136,5 +137,6 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=8080)
     args = parser.parse_args()
     port = args.port
-    server_sk, server_vk = nodes.pop('localhost:{}'.format(port))
+    server_sk, server_vk = nodes['localhost:{}'.format(port)]
+    nodes_list = [x for x in nodes.keys() if x != 'localhost:{}'.format(port)]
     app.run(port=port)
