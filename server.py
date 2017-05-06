@@ -83,6 +83,7 @@ def internal_registration():
         return json.dumps({'success': False})
 
     keys[payload['vk']] = 0, None
+    ledger.append(message)
 
     return json.dumps({"success": True,
                        "vk": payload['vk']})
@@ -128,7 +129,7 @@ def get_results():
 
 @app.route('/ledger')
 def get_ledger():
-    return json.dumps({'vks': [server_vk], 'ledger': ledger})
+    return json.dumps({'vks': [s[1] for s in nodes.values()], 'ledger': ledger})
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
