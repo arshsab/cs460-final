@@ -114,20 +114,25 @@ def main():
         print('Server not active')
         return
 
-    action = input('Action (register, vote, results, checkvote): ')
-    action = action.lower()
+    while True:
+        action = input('Action (register, vote, results, checkvote): ')
+        action = action.lower()
 
-    if action == 'register':
-        create(server)
-    elif action == 'results':
-        results(server)
-    elif action == 'vote':
-        vote(server)
-    elif action == 'checkvote':
-        checkvote(server)
-    else:
-        print('Option not recognized')
+        if action == 'register':
+            create(server)
+        elif action == 'results':
+            results(server)
+        elif action == 'vote':
+            vote(server)
+        elif action == 'checkvote':
+            checkvote(server)
+        else:
+            print('Option not recognized')
 
+        cont = input('Perform another action (y/n)?')
+
+        if cont != 'y':
+            break
 
 if __name__ == '__main__':
     main()
