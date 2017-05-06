@@ -1,5 +1,7 @@
 import time
 
-nodes = ['localhost:8080', 'localhost:8081', 'localhost:8082']
+nodes = {'localhost:8080': (None, None),
+         'localhost:8081': (None, None),
+         'localhost:8082': (None, None)}
 options = ['Bernie', 'Hillary', 'Trump']
 end_time = time.time() + 24 * 3600

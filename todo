@@ -1,10 +1,11 @@
 Server:
 X   /key > gives server's verification key
-X   /register > generate's a signing + verification key and propogatesX   /vote > submit's vote and propogates
+X   /register > generates a signing + verification key and propogates
+X   /vote > submit's vote and propogates
 X   /results > returns the results of the election
     /ledger > returns the ledgeer of the votes
-    publish functions > pushes update to other nodes
-    /publish_registration > other servers send their registration here
+X   publish functions > pushes update to other nodes
+X   /publish_registration > other servers send their registration here
 
 
 Offline:

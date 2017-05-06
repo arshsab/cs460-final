@@ -4,6 +4,7 @@ import time
 from blockchain import *
 import json
 from collections import Counter
+import requests
 
 app = Flask(__name__)
 keys = {}
@@ -13,10 +14,12 @@ results = Counter()
 server_sk, server_vk = generate_key_pair()
 
 def publish_vote(msg):
-    pass
+    for node in nodes.keys():
+        requests.post(node+'/vote', data={'vote': msg})
 
 def publish_registration(msg):
-    pass
+    for node in nodes.keys():
+        requests.post(node+'/publish_register', data={'registration': msg})
 
 @app.route('/status')
 def status():
@@ -32,11 +35,14 @@ def choices():
 
 @app.route('/register', methods=['POST'])
 def register():
+    # Let registrations be self-signed
     name = request.args.get('name')
     vk = request.args.get('vk')
 
     if name in names:
-        return json.loads({"success": False})
+        return json.dumps({'success': False})
+    if vk in keys:
+        return json.dumps({"success": False})
 
     message = generate_registration_message(server_sk, server_vk, vk)
     publish_registration(message)
@@ -46,6 +52,26 @@ def register():
 
     return json.dumps({"success": True,
                        "vk": vk})
+
+@app.route('publish_registration', methods=['POST'])
+def internal_registration():
+    reg = json.loads(request.args.get('registration'))
+    vk = reg['vk']
+    if vk not in nodes.values():
+        return json.dumps({'success': False})
+
+    if not verify_message(request.args):
+        return json.dumps({'success': False})
+
+    # Since reg is trusted and from peer, should be fine to just add
+    payload = json.loads(request.args.get('payload'))
+    if payload['action'] != 'register':
+        return json.dumps({'success': False})
+
+    keys[payload[vk]] = 0, None
+
+    return json.dumps({"success": True,
+                       "vk": payload[vk]})
 
 @app.route('/vote', methods=['POST'])
 def vote():
